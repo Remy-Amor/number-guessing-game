@@ -51,12 +51,19 @@
 					this.lostGame();
 				} 
 				else if (this.guess == this.secret) {
-					this.pastGuesses.push(this.guess);
-					this.msg = "You got it!";
-					this.gameEnded = true;
+					if(this.gameEnded == false){
+						this.pastGuesses.push(this.guess);
+						this.msg = "You got it!";
+						this.gameEnded = true;
+						this.attemptsLeft -= 1;
+					} 
+					else {
+						return;
+					}
 				} 
 				else if (this.attemptsLeft == 1) {
 					this.attemptsLeft -= 1;
+					this.pastGuesses.push(this.guess);
 					this.lostGame();
 				}
 				else if (this.guess < this.secret) {
