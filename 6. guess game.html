@@ -8,20 +8,23 @@
 </head>
 
 <body>
-	<h1>Guess Odd or Even Number</h1>
+	<h1>Guess The Number!</h1>
 	<div id="app">
-	<p>You are be given a nummber from 1 to 100, guess it is an odd number or even number (enter 'odd' or 'even'):</p>
+	<p>Guess a number that has been generated between 1-100:</p>
 	<p><input type="text" v-model="guess" /></p>
 
 	<p>
 		<button v-on:click="checkGuess()">Check Guess</button>
-		<button v-on:click="giveUp()">Give Up</button>
-		<button v-on:click="startOver()">Start</button>
+		<button v-on:click="lostGame()">Give Up</button>
+		<button v-on:click="startOver()">Start Over</button>
 	</p>
 
-	<p>Message: {{ msg }}</p>			
+	<p>Message: {{ msg }}</p>	
+	<p>Attempts Left: {{attemptsLeft}}</p>		
 	<hr>
-	<p>For your information, the secret number randomly generated is: {{ secret }}</p>		
+	<p>For your information, the secret number randomly generated is: {{ secret }}</p>	
+	<p><b>Past guesses:</b></p>	
+	<p v-for="pastGuess in pastGuesses">{{pastGuess}}</p>
 	 
 		 
 	</div>
@@ -34,7 +37,7 @@
 	const { createApp } = Vue
 	createApp({	 //create a new application instance
 		data() {     // data option
-			return {guess:'', msg:'', secret:0 
+			return {guess:'', msg:'', secret:0, attemptsLeft:0, gameEnded:false, pastGuesses: []
 			}
 		},
 		
@@ -43,25 +46,51 @@
 			  return Math.floor(Math.random() * 100) + 1;
 			},
      
-			checkGuess: function () {     
-				if (this.secret%2==0 && this.guess=='even'  || this.secret%2==1 && this.guess=='odd')
-					this.msg = "Correct.";
-				else
-					this.msg = "Incorrect.";
+			checkGuess: function () { 
+				if(this.gameEnded == true && this.guess != this.secret) {
+					this.lostGame();
+				} 
+				else if (this.guess == this.secret) {
+					this.pastGuesses.push(this.guess);
+					this.msg = "You got it!";
+					this.gameEnded = true;
+				} 
+				else if (this.attemptsLeft == 1) {
+					this.attemptsLeft -= 1;
+					this.lostGame();
+				}
+				else if (this.guess < this.secret) {
+					this.pastGuesses.push(this.guess);
+					this.msg = "Guess higher";
+				}
+				else if (this.guess > this.secret) {
+					this.pastGuesses.push(this.guess);
+					this.msg = "Guess lower";
+				} else {
+					this.msg = "Please guess a valid number";
+				}
+				if(this.gameEnded == false) {
+					this.attemptsLeft -= 1; 
+				}
+
 			},
 			startOver: function () {     
 				this.msg = "Start guessing.";
 				this.secret = this.genRandomNum();
+				this.attemptsLeft = 5;
+				this.gameEnded = false;
+				this.pastGuesses = [];
 			},
-			giveUp: function () {     
+			lostGame: function () {  
 				this.msg = "The secret number is " + this.secret;
+				this.gameEnded = true;
+				
 			}
 			
 		},
 		
 		created: function () {//Called after the instance is created
-			this.msg = "Start guessing.";
-			this.secret = this.genRandomNum();
+			this.startOver();
 		}
 		}).mount('#app')   // mount the app to dom element
 	</script>
