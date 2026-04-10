@@ -15,7 +15,7 @@
 
 	<p>
 		<button v-on:click="checkGuess()">Check Guess</button>
-		<button v-on:click="lostGame()">Give Up</button>
+		<button v-on:click="endGame()">Give Up</button>
 		<button v-on:click="startOver()">Start Over</button>
 	</p>
 
@@ -37,7 +37,7 @@
 	const { createApp } = Vue
 	createApp({	 //create a new application instance
 		data() {     // data option
-			return {guess:'', msg:'', secret:0, attemptsLeft:0, gameEnded:false, pastGuesses: []
+			return {guess:'', msg:'', secret:0, attemptsLeft:0, gameEnded:false, wonGame: false, pastGuesses: []
 			}
 		},
 		
@@ -51,13 +51,14 @@
 					this.msg = "Please guess a valid number";
 				}
 				else if(this.gameEnded == true && this.guess != this.secret) {
-					this.lostGame();
+					return;
 				} 
 				else if (this.guess == this.secret) {
 					if(this.gameEnded == false){
 						this.pastGuesses.push(this.guess);
 						this.msg = "You got it!";
 						this.gameEnded = true;
+						this.wonGame = true;
 						this.attemptsLeft -= 1;
 					} 
 					else {
@@ -67,14 +68,16 @@
 				else if (this.attemptsLeft == 1) {
 					this.attemptsLeft -= 1;
 					this.pastGuesses.push(this.guess);
-					this.lostGame();
+					this.endGame();
 				}
 				else if (this.guess < this.secret) {
 					this.pastGuesses.push(this.guess);
+					this.attemptsLeft -=1;
 					this.msg = "Guess higher";
 				}
 				else if (this.guess > this.secret) {
 					this.pastGuesses.push(this.guess);
+					this.attemptsLeft -=1;
 					this.msg = "Guess lower";
 				} else {
 					this.msg = "Please guess a valid number";
@@ -87,8 +90,9 @@
 				this.attemptsLeft = 5;
 				this.gameEnded = false;
 				this.pastGuesses = [];
+				this.wonGame = false;
 			},
-			lostGame: function () {  
+			endGame: function () {  
 				this.msg = "The secret number is " + this.secret;
 				this.gameEnded = true;
 				
