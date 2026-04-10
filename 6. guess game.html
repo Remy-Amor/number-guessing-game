@@ -47,7 +47,10 @@
 			},
      
 			checkGuess: function () { 
-				if(this.gameEnded == true && this.guess != this.secret) {
+				if(typeof this.guess !== "string" || this.guess <= 0 || this.guess > 100) {
+					this.msg = "Please guess a valid number";
+				}
+				else if(this.gameEnded == true && this.guess != this.secret) {
 					this.lostGame();
 				} 
 				else if (this.guess == this.secret) {
@@ -76,10 +79,7 @@
 				} else {
 					this.msg = "Please guess a valid number";
 				}
-				if(this.gameEnded == false) {
-					this.attemptsLeft -= 1; 
-				}
-
+				
 			},
 			startOver: function () {     
 				this.msg = "Start guessing.";
